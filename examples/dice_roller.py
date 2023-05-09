@@ -1,7 +1,7 @@
 import d20  # pip install d20
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+import fastlmi
 from fastlmi import FastLMI
 
 app = FastLMI(
@@ -20,13 +20,8 @@ app = FastLMI(
     contact_email="foo@example.com",
     legal_url="https://example.com/legal",
 )
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# use this when developing localhost plugins to allow the browser to make the local request
+fastlmi.utils.cors_allow_openai(app)
 
 
 class DiceRequest(BaseModel):

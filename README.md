@@ -24,9 +24,11 @@ this BibTex entry!
 ```bibtex
 @software{Zhu_FastLMI_2023,
     author = {Zhu, Andrew},
-    month = {05},
+    doi = {10.5281/zenodo.7916737},
+    month = may,
     title = {{FastLMI}},
-    url = {https://github.com/zhudotexe/FastLMI},
+    url = {https://github.com/zhudotexe/fastlmi},
+    version = {0.1.0},
     year = {2023}
 }
 ```

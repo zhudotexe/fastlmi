@@ -2,6 +2,9 @@
 
 A work-in-progress package to quickly define and iterate on language model interfaces (LMIs).
 
+<!--
+For developers:
+
 ## Build and Publish
 
 `fastlmi` uses Hatchling to build.
@@ -10,3 +13,4 @@ A work-in-progress package to quickly define and iterate on language model inter
 python -m build
 python -m twine upload dist/*
 ```
+-->

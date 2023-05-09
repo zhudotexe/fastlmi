@@ -126,8 +126,6 @@ INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 ```
 
-FastLMI automatically handles generating all the plugin metadata needed by OpenAI!
-
 ### Register it
 
 Finally, we need to tell ChatGPT about the new plugin.
@@ -137,7 +135,8 @@ Here, type in the address of your plugin. By default, it's `localhost:8000`.
 
 ![](assets/oai_manifest.png "Enter your website domain")
 
-Click "Find manifest file," and you should see your plugin appear!
+Click "Find manifest file," and you should see your plugin appear. FastLMI automatically handles generating all the
+plugin metadata needed by OpenAI!
 
 ![](assets/oai_found_plugin.png "Found plugin")
 

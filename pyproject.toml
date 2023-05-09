@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fastlmi"
-version = "0.0.1"
+version = "0.1.0"
 authors = [
     { name = "Andrew Zhu", email = "andrew@zhu.codes" },
 ]
@@ -16,7 +16,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     # https://pypi.org/classifiers/
-    "Development Status :: 1 - Planning",
+    "Development Status :: 2 - Pre-Alpha",
     "Framework :: FastAPI",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",

@@ -52,8 +52,8 @@ $ pip install uvicorn
 
 ## Example (OpenAI/ChatGPT Plugin)
 
-> NOTE: As of v0.1.0 FastLMI includes the OpenAI plugin interface as a default. This may change to an extension-based
-> system in the future as the library develops.
+> NOTE: As of v0.1.0 FastLMI includes the AI Plugin (OpenAI) interface as a default. This may change to an
+> extension-based system in the future as the library develops.
 
 To show off just how easy it is to create a plugin, let's make a ChatGPT plugin that gives it the ability to roll dice
 in the d20 format (AIs playing D&D, anyone?).
@@ -140,7 +140,7 @@ plugin metadata needed by OpenAI!
 
 ![](assets/oai_found_plugin.png "Found plugin")
 
-## Chat away
+### Chat away
 
 To use your new plugin, select it from the list of plugins when starting a new chat:
 
@@ -150,6 +150,52 @@ and start chatting. Congratulations! 🎉 You've just created a brand-new ChatGP
 else you'll make!
 
 ![](assets/oai_dice_roller.png "Conversation with ChatGPT using Dice Roller")
+
+## Example (LangChain Plugin)
+
+## Authentication
+
+As of v0.2.0, FastLMI has built-in support for service-level auth, where the AI agent or LMI driver will send an
+authorization token you decide as a header with each request.
+
+Enabling authentication is easy! First, define the authentication scheme you wish to use - this will be a subclass of
+`LMIAuth`. For example, to provide service-level auth, you can define the `LMIServiceAuth` scheme:
+
+```python
+from fastlmi import Depends, FastLMI
+from fastlmi.auth import LMIServiceAuth
+
+auth = LMIServiceAuth(
+    access_tokens=["your_secret_token_here"],
+    verification_tokens={"openai": "verification_token_generated_in_the_ChatGPT_UI"}
+)
+```
+
+This auth scheme allows defining a set of allowed access tokens (if one wanted to, for example, have a different
+token for each plugin service). Then, define your app as normal:
+
+```python
+app = FastLMI(auth=auth, dependencies=[Depends(auth)], ...)
+```
+
+Tada! 🎉 Your LMI now tells consumers that it uses the `service_http` auth scheme, and will validate that each request to
+one of your defined routes provides a valid Bearer token.
+
+A complete example is in `examples/ai_plugin_auth.py`.
+
+### Route-Level Auth
+
+If you wanted to only require that certain routes use auth, you can also define the auth dependency on a route level:
+
+```diff
+- app = FastLMI(auth=auth, dependencies=[Depends(auth)], ...)
++ app = FastLMI(auth=auth, ...)
+...
+- @app.post("/hello")
++ @app.post("/hello", dependencies=[Depends(auth)])
+def hello():
+    ...
+```
 
 ## Read More
 

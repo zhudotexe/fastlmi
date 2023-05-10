@@ -51,7 +51,7 @@ class PluginManifest(BaseModel):
     name_for_human: str
     description_for_model: str
     description_for_human: str
-    auth: Union[ManifestNoAuth, ManifestServiceHttpAuth, ManifestUserHttpAuth, ManifestOAuthAuth]
+    auth: Union[ManifestServiceHttpAuth, ManifestUserHttpAuth, ManifestOAuthAuth, ManifestNoAuth]
     api: ApiSpec
     logo_url: str
     contact_email: str

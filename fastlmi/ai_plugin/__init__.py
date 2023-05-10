@@ -5,4 +5,5 @@ from .models import (
     ManifestUserHttpAuth,
     PluginManifest,
     ApiSpec,
+    BaseManifestAuth,
 )

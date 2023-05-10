@@ -52,7 +52,7 @@ $ pip install uvicorn
 
 ## Example (OpenAI/ChatGPT Plugin)
 
-> NOTE: As of v0.1.0 FastLMI includes the AI Plugin (OpenAI) interface as a default. This may change to an
+> NOTE: As of v0.2.0 FastLMI includes the AI Plugin (OpenAI, LangChain) interface as a default. This may change to an
 > extension-based system in the future as the library develops.
 
 To show off just how easy it is to create a plugin, let's make a ChatGPT plugin that gives it the ability to roll dice
@@ -151,7 +151,31 @@ else you'll make!
 
 ![](assets/oai_dice_roller.png "Conversation with ChatGPT using Dice Roller")
 
-## Example (LangChain Plugin)
+## Example (LangChain Tool)
+
+LangChain supports
+[interfacing with AI plugins](https://python.langchain.com/en/latest/modules/agents/tools/examples/chatgpt_plugins.html)!
+If you've followed the steps above (at least up through "Run it"), you can also expose your new LMI to a LangChain
+agent.
+
+This example assumes that you
+have [LangChain](https://python.langchain.com/en/latest/getting_started/getting_started.html) installed, and that your
+LMI is running at `http://localhost:8000`.
+
+```python
+from langchain.agents import AgentType
+from langchain.agents import initialize_agent, load_tools
+from langchain.chat_models import ChatOpenAI
+from langchain.tools import AIPluginTool
+
+tool = AIPluginTool.from_plugin_url("http://localhost:8000/.well-known/ai-plugin.json")
+llm = ChatOpenAI(temperature=0)
+tools = load_tools(["requests_all"])
+tools += [tool]
+
+agent_chain = initialize_agent(tools, llm, agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+agent_chain.run("Can you roll me stats for a D&D character?")
+```
 
 ## Authentication
 
@@ -172,24 +196,25 @@ auth = LMIServiceAuth(
 ```
 
 This auth scheme allows defining a set of allowed access tokens (if one wanted to, for example, have a different
-token for each plugin service). Then, define your app as normal:
+token for each plugin service). Then, when you define your app, all you have to do is add 2 parameters:
 
 ```python
-app = FastLMI(auth=auth, dependencies=[Depends(auth)], ...)
+app = FastLMI(..., auth=auth, dependencies=[Depends(auth)])
 ```
 
-Tada! 🎉 Your LMI now tells consumers that it uses the `service_http` auth scheme, and will validate that each request to
-one of your defined routes provides a valid Bearer token.
+Tada! 🎉 Your LMI now tells consumers that it uses the `service_http` auth scheme, and will validate that each request
+to one of your defined routes provides a valid Bearer token.
 
-A complete example is in `examples/ai_plugin_auth.py`.
+A complete example is in `examples/ai_plugin_auth.py`. You can read more about OpenAI's service-level
+auth [here](https://platform.openai.com/docs/plugins/authentication/service-level).
 
 ### Route-Level Auth
 
 If you wanted to only require that certain routes use auth, you can also define the auth dependency on a route level:
 
 ```diff
-- app = FastLMI(auth=auth, dependencies=[Depends(auth)], ...)
-+ app = FastLMI(auth=auth, ...)
+- app = FastLMI(..., auth=auth, dependencies=[Depends(auth)])
++ app = FastLMI(..., auth=auth)
 ...
 - @app.post("/hello")
 + @app.post("/hello", dependencies=[Depends(auth)])
@@ -206,7 +231,6 @@ the [FastAPI documentation](https://fastapi.tiangolo.com/) for more!
 
 - scopes
 - script to check for missing docs, over limits, etc
-- auth - for the moment, FastLMI does not support auth
 - logging
 - configure ecosystems
 

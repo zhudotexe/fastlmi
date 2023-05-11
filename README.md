@@ -245,6 +245,7 @@ Make sure to bump the version in pyproject.toml before publishing, then update C
 citation from zenodo after the release is indexed.
 
 ```shell
+rm dist/*
 python -m build
 python -m twine upload dist/*
 ```

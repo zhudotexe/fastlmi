@@ -21,7 +21,7 @@ class FastLMI(FastAPI):
         name_for_model: Optional[str] = None,
         description_for_model: Optional[str] = None,
         logo_url: Optional[str] = None,
-        contact_email: str = "",  # todo maybe make these optional and have option to enable openai?
+        contact_email: str = "",
         legal_url: str = "",
         ai_plugin_manifest_url: Optional[str] = "/.well-known/ai-plugin.json",
         auth: Optional[LMIAuth] = None,
@@ -39,7 +39,7 @@ class FastLMI(FastAPI):
         :param contact_email: Email contact for safety/moderation, support, and deactivation
         :param legal_url: Redirect URL for users to view the application's legal information (e.g. Terms of Service)
         :param ai_plugin_manifest_url: The path to expose the AI plugin (OpenAI) manifest at
-        :param auth: The authentication scheme to expose in the service manifest(s)
+        :param auth: The authentication scheme to expose in the LMI manifest(s)
         :param kwargs: Extra options to pass to FastAPI
         """
         self.name_for_model = name_for_model or title

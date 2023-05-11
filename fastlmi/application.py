@@ -1,12 +1,15 @@
+import os
+import stat
 from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import FileResponse, JSONResponse
 
 from fastlmi import ai_plugin
 from fastlmi.auth import LMIAuth
+from fastlmi.typing import PathLike
 
 
 class FastLMI(FastAPI):
@@ -88,3 +91,29 @@ class FastLMI(FastAPI):
                 )
             )
         )
+
+    def serve_local_logo(self, path: PathLike, url: str = "/logo", **kwargs):
+        """
+        Serve the static image file located at `path` at the route specified by `url`.
+
+        Extra `**kwargs` are passed to :cls:`starlette.FileResponse`.
+        """
+        self.logo_url = url
+        # we can take advantage of caching by stat()ing the file; this assumes that the logo file never changes
+        # if it does for some reason, pass `stat_result=None` as a kwarg to recalculate headers on each request
+        if "stat_result" not in kwargs:
+            try:
+                stat_result = os.stat(path)
+            except FileNotFoundError:
+                raise
+            else:
+                mode = stat_result.st_mode
+                if not stat.S_ISREG(mode):
+                    raise ValueError(f"File at path {path} is not a file.")
+                kwargs["stat_result"] = stat_result
+
+        def _local_serve(req: Request) -> FileResponse:
+            # we pass the method along from the req so that it can skip reading the file body on HEAD requests
+            return FileResponse(path, method=req.method, **kwargs)
+
+        self.add_route(self.logo_url, _local_serve, include_in_schema=False)

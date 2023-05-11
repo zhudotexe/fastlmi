@@ -5,7 +5,7 @@ from typing import Optional
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from starlette.requests import Request
-from starlette.responses import FileResponse, JSONResponse
+from starlette.responses import FileResponse, JSONResponse, guess_type
 
 from fastlmi import ai_plugin
 from fastlmi.auth import LMIAuth
@@ -20,7 +20,7 @@ class FastLMI(FastAPI):
         description: str,
         name_for_model: Optional[str] = None,
         description_for_model: Optional[str] = None,
-        logo_url: Optional[str] = None,  # todo could be fun to add a func to serve image
+        logo_url: Optional[str] = None,
         contact_email: str = "",  # todo maybe make these optional and have option to enable openai?
         legal_url: str = "",
         ai_plugin_manifest_url: Optional[str] = "/.well-known/ai-plugin.json",
@@ -34,7 +34,8 @@ class FastLMI(FastAPI):
             numbers)
         :param description_for_model: Description better tailored to the model, such as token context length
             considerations or keyword usage for improved plugin prompting
-        :param logo_url: URL the logo image is hosted at (can be relative to root or external URL)
+        :param logo_url: URL the logo image is hosted at (can be relative to root or external URL) - also
+            see :meth:`serve_local_logo`
         :param contact_email: Email contact for safety/moderation, support, and deactivation
         :param legal_url: Redirect URL for users to view the application's legal information (e.g. Terms of Service)
         :param ai_plugin_manifest_url: The path to expose the AI plugin (OpenAI) manifest at
@@ -111,6 +112,8 @@ class FastLMI(FastAPI):
                 if not stat.S_ISREG(mode):
                     raise ValueError(f"File at path {path} is not a file.")
                 kwargs["stat_result"] = stat_result
+        if "media_type" not in kwargs:
+            kwargs["media_type"] = guess_type(path)[0] or "image/png"
 
         def _local_serve(req: Request) -> FileResponse:
             # we pass the method along from the req so that it can skip reading the file body on HEAD requests
